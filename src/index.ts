@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MyAssetContract } from './my-asset-contract';
-export { MyAssetContract } from './my-asset-contract';
+import { CopyrightContract } from './contracts/CopyrightContract';
+export { CopyrightContract } from './contracts/CopyrightContract';
 
-export const contracts: any[] = [ MyAssetContract ];
+export const contracts: any[] = [ CopyrightContract ];
