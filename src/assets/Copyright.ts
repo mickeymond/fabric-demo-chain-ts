@@ -1,7 +1,7 @@
 import { Object, Property } from 'fabric-contract-api';
 
 @Object()
-export class Author {
+class Author {
   @Property('name', 'string')
   public name: string; // Name of Author
 
