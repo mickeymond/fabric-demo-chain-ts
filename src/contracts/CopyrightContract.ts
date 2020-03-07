@@ -17,20 +17,21 @@ export class CopyrightContract extends Contract {
   }
 
   @Transaction()
-  public async createCopyright(ctx: Context, copyrightId: string, name: string): Promise<void> {
-    const exists = await this.copyrightExists(ctx, copyrightId);
+  public async createCopyright(
+    ctx: Context, newCopyrightString: string
+  ): Promise<void> {
+    const newCopyrightObject: Copyright = JSON.parse(newCopyrightString);
+
+    const exists = await this.copyrightExists(ctx, newCopyrightObject.id);
     if (exists) {
-      throw new Error(`The Copyright ${copyrightId} already exists`);
+      throw new Error(`The Copyright ${newCopyrightObject.id} already exists`);
     }
 
-    const ledgerKey = ctx.stub.createCompositeKey('COPYRIGHT', [copyrightId]);
+    const ledgerKey = ctx.stub.createCompositeKey('COPYRIGHT', [newCopyrightObject.id]);
     const sender = ctx.clientIdentity.getID();
 
-    const copyright = new Copyright();
-
-    copyright.id = copyrightId;
-    copyright.name = name;
-    copyright.owner = sender;
+    const copyright = new Copyright(newCopyrightObject);
+    copyright.creator = sender;
 
     const buffer = Buffer.from(JSON.stringify(copyright));
     await ctx.stub.putState(ledgerKey, buffer);
@@ -70,24 +71,27 @@ export class CopyrightContract extends Contract {
   }
 
   @Transaction()
-  public async updateCopyright(ctx: Context, copyrightId: string, newName: string): Promise<void> {
-    const exists = await this.copyrightExists(ctx, copyrightId);
+  public async updateCopyright(
+    ctx: Context, updatedCopyrightString: string
+  ): Promise<void> {
+    const updatedCopyrightObject: Copyright = JSON.parse(updatedCopyrightString);
+
+    const exists = await this.copyrightExists(ctx, updatedCopyrightObject.id);
     if (!exists) {
-      throw new Error(`The Copyright ${copyrightId} does not exist`);
+      throw new Error(`The Copyright ${updatedCopyrightObject.id} does not exist`);
     }
 
-    const existingCopyright = await this.readCopyright(ctx, copyrightId);
+    const existingCopyright = await this.readCopyright(ctx, updatedCopyrightObject.id);
     const sender = ctx.clientIdentity.getID();
-    if (existingCopyright.owner !== sender) {
-      throw new Error(`You are not Authorised to update Copyright ${copyrightId}`);
+
+    if (existingCopyright.creator !== sender) {
+      throw new Error(`You are not Authorised to update Copyright ${updatedCopyrightObject.id}`);
     }
 
-    const ledgerKey = ctx.stub.createCompositeKey('COPYRIGHT', [copyrightId]);
+    const ledgerKey = ctx.stub.createCompositeKey('COPYRIGHT', [updatedCopyrightObject.id]);
 
-    const copyright = new Copyright();
-    copyright.id = copyrightId;
-    copyright.name = newName;
-    copyright.owner = sender;
+    const copyright = new Copyright(updatedCopyrightObject);
+    copyright.creator = sender;
 
     const buffer = Buffer.from(JSON.stringify(copyright));
     await ctx.stub.putState(ledgerKey, buffer);
@@ -102,7 +106,7 @@ export class CopyrightContract extends Contract {
 
     const existingCopyright = await this.readCopyright(ctx, copyrightId);
     const sender = ctx.clientIdentity.getID();
-    if (existingCopyright.owner !== sender) {
+    if (existingCopyright.creator !== sender) {
       throw new Error(`You are not Authorised to delete Copyright ${copyrightId}`);
     }
 
