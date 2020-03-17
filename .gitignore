@@ -79,6 +79,10 @@ typings/
 # Compiled TypeScript files
 dist
 
+# Others
+.vscode
+.vs
+
 # Lock Files
 package-lock.json
 yarn.lock
