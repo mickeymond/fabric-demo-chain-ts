@@ -7,12 +7,12 @@ import { Copyright } from '../assets/Copyright';
 
 @Info({title: 'CopyrightContract', description: 'Copyright Contract' })
 export class CopyrightContract extends Contract {
-  private copyrightKey: string = 'COPYRIGHT';
+  private COPYRIGHT_KEY: string = 'COPYRIGHT';
 
   @Transaction(false)
   @Returns('boolean')
   public async copyrightExists(ctx: Context, copyrightId: string): Promise<boolean> {
-    const ledgerKey = ctx.stub.createCompositeKey(this.copyrightKey, [copyrightId]);
+    const ledgerKey = ctx.stub.createCompositeKey(this.COPYRIGHT_KEY, [copyrightId]);
     const buffer = await ctx.stub.getState(ledgerKey);
     return (!!buffer && buffer.length > 0);
   }
@@ -28,7 +28,7 @@ export class CopyrightContract extends Contract {
       throw new Error(`The Copyright ${newCopyrightObject.id} already exists`);
     }
 
-    const ledgerKey = ctx.stub.createCompositeKey(this.copyrightKey, [newCopyrightObject.id]);
+    const ledgerKey = ctx.stub.createCompositeKey(this.COPYRIGHT_KEY, [newCopyrightObject.id]);
     const sender = ctx.clientIdentity.getID();
 
     const copyright = new Copyright(newCopyrightObject);
@@ -46,7 +46,7 @@ export class CopyrightContract extends Contract {
       throw new Error(`The Copyright ${copyrightId} does not exist`);
     }
 
-    const ledgerKey = ctx.stub.createCompositeKey(this.copyrightKey, [copyrightId]);
+    const ledgerKey = ctx.stub.createCompositeKey(this.COPYRIGHT_KEY, [copyrightId]);
     const buffer = await ctx.stub.getState(ledgerKey);
     const copyright = JSON.parse(buffer.toString()) as Copyright;
 
@@ -57,7 +57,7 @@ export class CopyrightContract extends Contract {
   @Returns('Copyright[]')
   public async readAllCopyright(ctx: Context): Promise<Copyright[]> {
     const result: Copyright[] = [];
-    const iterator = await ctx.stub.getStateByPartialCompositeKey(this.copyrightKey, []);
+    const iterator = await ctx.stub.getStateByPartialCompositeKey(this.COPYRIGHT_KEY, []);
 
     let value = (await iterator.next()).value
 
@@ -89,7 +89,7 @@ export class CopyrightContract extends Contract {
       throw new Error(`You are not Authorised to update Copyright ${updatedCopyrightObject.id}`);
     }
 
-    const ledgerKey = ctx.stub.createCompositeKey(this.copyrightKey, [updatedCopyrightObject.id]);
+    const ledgerKey = ctx.stub.createCompositeKey(this.COPYRIGHT_KEY, [updatedCopyrightObject.id]);
 
     const copyright = new Copyright(updatedCopyrightObject);
     copyright.creator = sender;
@@ -111,7 +111,7 @@ export class CopyrightContract extends Contract {
       throw new Error(`You are not Authorised to delete Copyright ${copyrightId}`);
     }
 
-    const ledgerKey = ctx.stub.createCompositeKey(this.copyrightKey, [copyrightId]);
+    const ledgerKey = ctx.stub.createCompositeKey(this.COPYRIGHT_KEY, [copyrightId]);
     await ctx.stub.deleteState(ledgerKey);
   }
 
